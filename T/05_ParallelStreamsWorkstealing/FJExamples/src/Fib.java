@@ -15,14 +15,14 @@ public class Fib extends RecursiveTask<Integer> {
 				Runtime.getRuntime().availableProcessors()/2
 			);
 		
-		Fib f = new Fib(5);
+		Fib f = new Fib(10);
 		p1.execute(f);
 		
 		p2.execute(f);
 		
 		
 		
-		System.out.println("Fib 5 = " + f.join());
+		System.out.println("Fib 10 = " + f.join());
 	}
 	
 	private int n;

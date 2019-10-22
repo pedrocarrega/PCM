@@ -1,4 +1,5 @@
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Sum {
 	static final double errorTolerance = 1.0e-4;
