@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 public class KnapsackGA {
-	private static final int N_GENERATIONS = 500;
+	private static final int N_GENERATIONS = 2500;
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	
@@ -31,7 +31,6 @@ public class KnapsackGA {
 			}
 			
 			// Step2 - Sort by Fitness descending
-			
 			Arrays.sort(population, new Comparator<Individual>() {
 				@Override
 				public int compare(Individual o1, Individual o2) {
@@ -43,7 +42,7 @@ public class KnapsackGA {
 			
 			// Debug
 			
-			System.out.println("Best fitness at " + generation + " is " + population[0].fitness);
+			//System.out.println("Best fitness at " + generation + " is " + population[0].fitness);
 			
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];
