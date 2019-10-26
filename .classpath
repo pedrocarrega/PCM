@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Assignments/Assignment_01_Code/src"/>
+	<classpathentry kind="src" path="T/02_EmbarrassinglyParallel"/>
+	<classpathentry kind="src" path="T/03_ThreadMemory/PCM02/src"/>
+	<classpathentry kind="src" path="T/04_ForkJoin/FJExamples/src"/>
+	<classpathentry kind="src" path="T/05_ParallelStreamsWorkstealing/FJExamples/src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
