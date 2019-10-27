@@ -3,8 +3,8 @@ import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 
 public class KnapsackGA {
-	private static final int N_GENERATIONS = 2500;
-	private static final int POP_SIZE = 5;
+	private static final int N_GENERATIONS = 1000;
+	private static final int POP_SIZE = 10000;
 	private static final double PROB_MUTATION = 0.5;
 	
 	private Random r = new Random();
@@ -31,21 +31,11 @@ public class KnapsackGA {
 			
 			// Step2 - Sort by Fitness descending
 			//Done
-			new ForkJoinPool(Runtime.getRuntime().availableProcessors()).execute(new ParallelMergeSort(population, 0, population.length - 1));
-			
-			//Debug sort order
-			int counter = 0;
-			for(int i = 1; i < population.length; i++) {
-				if(population[i - 1].fitness < population[i].fitness)
-					counter++;
-			}
-			System.out.println("Counter: " + counter);
-			
-			
+			new ForkJoinPool(Runtime.getRuntime().availableProcessors()).invoke(new ParallelMergeSort(population, 0, population.length - 1));
 			
 			// Debug
 			
-			//System.out.println("Best fitness at " + generation + " is " + population[0].fitness);
+			System.out.println("Best fitness at " + generation + " is " + population[0].fitness);
 			
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];

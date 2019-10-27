@@ -1,6 +1,7 @@
 package knapsack;
 //import java.util.Random;
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Individual {
@@ -14,8 +15,8 @@ public class Individual {
 	
 	static {
 		// This code initializes the problem.
-		ThreadLocalRandom r = ThreadLocalRandom.current();
-		//Random r = new Random(1L);
+		//ThreadLocalRandom r = ThreadLocalRandom.current();
+		Random r = new Random(1L);
 		for (int i =0; i<GENE_SIZE; i++) {
 			VALUES[i] = r.nextInt(100);
 			WEIGHTS[i] = r.nextInt(100);
@@ -32,8 +33,8 @@ public class Individual {
 	public int fitness;
 
 	public static Individual createRandom() {
-		ThreadLocalRandom r = ThreadLocalRandom.current();
-		//Random r = new Random();
+		//ThreadLocalRandom r = ThreadLocalRandom.current();
+		Random r = new Random();
 		Individual ind = new Individual();
 		for (int i=0; i<GENE_SIZE; i++) {
 			ind.selectedItems[i] = r.nextBoolean(); 
@@ -68,8 +69,8 @@ public class Individual {
 	 * After that point, uses genes from mom (mate)
 	 */
 	public Individual crossoverWith(Individual mate) {
-		ThreadLocalRandom r = ThreadLocalRandom.current();
-		//Random r = new Random();
+		//ThreadLocalRandom r = ThreadLocalRandom.current();
+		Random r = new Random();
 		Individual child = new Individual();
 		int crossoverPoint = r.nextInt(GENE_SIZE);
 		for (int i=0; i<GENE_SIZE; i++) {
@@ -83,8 +84,8 @@ public class Individual {
 	}
 
 	public void mutate() {
-		ThreadLocalRandom r = ThreadLocalRandom.current();
-		//Random r = new Random();
+		//ThreadLocalRandom r = ThreadLocalRandom.current();
+		Random r = new Random();
 		int mutationPoint = r.nextInt(GENE_SIZE);
 		this.selectedItems[mutationPoint] = !this.selectedItems[mutationPoint];
 	}
