@@ -5,7 +5,7 @@ import java.util.concurrent.RecursiveAction;
 @SuppressWarnings("serial")
 public class ParallelMergeSort extends RecursiveAction{
 	
-	private static final int MAX = 1 << 13;
+	private static final int MAX = 8192;
 	private final Individual[] array;
 	private final Individual[] helper;
 	private final int low;
