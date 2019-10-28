@@ -1,22 +1,33 @@
 package knapsack;
+
+//import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 public class KnapsackGA {
-	private static final int N_GENERATIONS = 1000;
-	private static final int POP_SIZE = 10000;
+	private static final int N_GENERATIONS = 500;
+	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private Individual[] population = new Individual[POP_SIZE];
+	
+	//private Random r = new Random();
 
 	public KnapsackGA() {
 		populateInitialPopulationRandomly();
 	}
 
 	private void populateInitialPopulationRandomly() {
-		for (int i=0; i<POP_SIZE; i++) {
+		
+		/*for (int i=0; i<POP_SIZE; i++) {
 			population[i] = Individual.createRandom();
-		}
+		}*/
+		
+		IntStream.range(0, POP_SIZE)
+		.parallel()
+		.forEach((int i) -> {
+			population[i] = Individual.createRandom(); 
+		});
 	}
 
 	public void run() {
@@ -57,14 +68,16 @@ public class KnapsackGA {
 
 				newPopulation[i] = population[pos1].crossoverWith(population[pos2]); 
 			});
-/*
+			
+			/*
 			for (int i=1; i<POP_SIZE; i++) {
 				// The first elements in the population have higher probability of being selected
 				int pos1 = (int) (- Math.log(r.nextDouble()) * POP_SIZE) % POP_SIZE;
 				int pos2 = (int) (- Math.log(r.nextDouble()) * POP_SIZE) % POP_SIZE;
 
 				newPopulation[i] = population[pos1].crossoverWith(population[pos2]);
-			}*/
+			}
+			*/
 			
 			IntStream.range(1, POP_SIZE)
 			 .parallel()
@@ -82,7 +95,8 @@ public class KnapsackGA {
 				if (r.nextDouble() < PROB_MUTATION) {
 					newPopulation[i].mutate();
 				}
-			}*/
+			}
+			*/
 			population = newPopulation;
 		}
 	}
