@@ -13,13 +13,47 @@ public class Individual {
 	
 	
 	static {
-		// This code initializes the problem.
+		
+		final int NTHREADS = Runtime.getRuntime().availableProcessors();
+		
+		Thread[] threads = new Thread[NTHREADS];
+		
+		for(int tid = 0; tid < NTHREADS; tid++) {
+			final int localTid = tid;
+			Runnable r = () -> {
+				int startIndex = localTid * GENE_SIZE / NTHREADS;
+				int endIndex = (localTid + 1) * GENE_SIZE / NTHREADS;
+				
+				ThreadLocalRandom rnd = ThreadLocalRandom.current();
+				
+				for(int i = startIndex; i < endIndex; i++) {
+					VALUES[i] = rnd.nextInt(100);
+					WEIGHTS[i] = rnd.nextInt(100);
+				}
+			};
+			
+			threads[localTid] = new Thread(r);
+			threads[localTid].start();
+		}
+		
+		for(Thread t:threads) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				
+				System.err.println(e);
+
+				e.printStackTrace();
+			}
+		}
+		
+		/*// This code initializes the problem.
 		ThreadLocalRandom r = ThreadLocalRandom.current();
 		//Random r = new Random(1L);
-		for (int i =0; i<GENE_SIZE; i++) {
+		for (int i = 0; i<GENE_SIZE; i++) {
 			VALUES[i] = r.nextInt(100);
 			WEIGHTS[i] = r.nextInt(100);
-		}
+		}*/
 	}
 	
 	/*
