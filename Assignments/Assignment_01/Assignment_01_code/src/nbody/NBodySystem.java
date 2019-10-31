@@ -1,6 +1,8 @@
 package nbody;
 
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Phaser;
 
 public class NBodySystem {
 	
@@ -13,7 +15,12 @@ public class NBodySystem {
 	static final double PI = 3.141592653589793;
 	static final double SOLAR_MASS = 4 * PI * PI;
 	
+	public long time = 0;
+	
 	protected NBody[] bodies;
+	protected NBody[] currentBodies;
+	
+	private final int NTHREADS = Runtime.getRuntime().availableProcessors();
 
 	public NBodySystem(int n, long seed) {
 		Random random = new Random(seed);
@@ -32,6 +39,10 @@ public class NBodySystem {
 	}
 	
 	public void advance(double dt) {
+		
+		
+		long startTime = System.currentTimeMillis();
+		
 
 		for (int i = 0; i < bodies.length; ++i) {
 			NBody iBody = bodies[i];
@@ -60,6 +71,8 @@ public class NBodySystem {
 			body.y += dt * body.vy;
 			body.z += dt * body.vz;
 		}
+		
+		time += (System.currentTimeMillis() - startTime);
 	}
 
 	public double energy() {
@@ -82,4 +95,38 @@ public class NBodySystem {
 		}
 		return e;
 	}
+	
+	void startTasks(List<Runnable> tasks, final int iterations) {
+		   final Phaser phaser = new Phaser() {
+		     protected boolean onAdvance(int phase, int registeredParties) {
+		    	 if(!(phase >= iterations || registeredParties == 0)) {
+		    		 currentBodies = bodies.clone();		    		 		    		 
+		    		 return false;
+		    	 }else
+		    		 return true;
+		     }
+		   };
+		   phaser.register(); // register for the first barrier with parties = 1
+		   int taskC = 0;
+		   for (final Runnable task : tasks) {
+			   final int count = taskC;
+		     phaser.register();
+		     new Thread() {
+		       public void run() {
+		         do {
+		           int startIndex = count * bodies.length/NTHREADS;
+		           int endIndex = (count + 1) * bodies.length/NTHREADS;
+		           
+		           for(int i = startIndex; i<endIndex; i++) {
+		        	   
+		           }
+		           
+		           phaser.arriveAndAwaitAdvance();
+		         } while (!phaser.isTerminated());
+		       }
+		     }.start();
+		     taskC++;
+		   }
+		   phaser.arriveAndDeregister(); // releases the first barrier
+		 }
 }
