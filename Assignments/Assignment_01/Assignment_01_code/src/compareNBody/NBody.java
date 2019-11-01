@@ -1,4 +1,4 @@
-package nbody;
+package compareNBody;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ public class NBody {
 		vz = -pz / NBodySystem.SOLAR_MASS;
 		return this;
 	}
-	/*
+	
 	@Override
 	public NBody clone() {
 		
@@ -47,7 +47,7 @@ public class NBody {
 
 		return copy;
 		
-	}*/
+	}
 	
 	public boolean equals(NBody compare) {
 		

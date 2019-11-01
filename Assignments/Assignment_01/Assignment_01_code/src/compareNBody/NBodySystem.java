@@ -1,4 +1,4 @@
-package nbody;
+package compareNBody;
 
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -39,7 +39,11 @@ public class NBodySystem {
 	public void advance(double dt) {
 
 		long startTime = System.currentTimeMillis();
-		NBody[] currentBodies = bodies.clone();
+		//NBody[] currentBodies = bodies.clone();
+		NBody[] currentBodies = new NBody[bodies.length];
+		for (int i = 0; i < bodies.length; i++) {
+			currentBodies[i] = new NBody();
+		}
 		
 
 		/*
@@ -70,7 +74,7 @@ public class NBodySystem {
 		 .forEach((int i) -> {
 			 NBody iBody = bodies[i];
 				for (int j = i + 1; j < bodies.length; ++j) {
-					final NBody body = currentBodies[j];
+					final NBody body = bodies[j];
 					double dx = iBody.x - body.x;
 					double dy = iBody.y - body.y;
 					double dz = iBody.z - body.z;
@@ -79,22 +83,33 @@ public class NBodySystem {
 					double distance = Math.sqrt(dSquared);
 					double mag = dt / (dSquared * distance);
 
-					iBody.vx -= dx * body.mass * mag;
-					iBody.vy -= dy * body.mass * mag;
-					iBody.vz -= dz * body.mass * mag;
+					currentBodies[i].vx -= dx * body.mass * mag;
+					currentBodies[i].vy -= dy * body.mass * mag;
+					currentBodies[i].vz -= dz * body.mass * mag;
 
-					body.vx += dx * iBody.mass * mag;
-					body.vy += dy * iBody.mass * mag;
-					body.vz += dz * iBody.mass * mag;
+					currentBodies[j].vx += dx * iBody.mass * mag;
+					currentBodies[j].vy += dy * iBody.mass * mag;
+					currentBodies[j].vz += dz * iBody.mass * mag;
 				}
 		 });
+		
+		IntStream.range(0, bodies.length)
+		 .parallel()
+		 .forEach((int i) -> {
+			 bodies[i].vx += currentBodies[i].vx;
+			 bodies[i].vx += currentBodies[i].vy;
+			 bodies[i].vx += currentBodies[i].vz;
+			 bodies[i].x += dt * bodies[i].vx;
+			 bodies[i].y += dt * bodies[i].vy;
+			 bodies[i].z += dt * bodies[i].vz;
+		 });/*
 
 		//Seq is faster because of overhead (tested for 1M)
 		for (NBody body : bodies) {
 			body.x += dt * body.vx;
 			body.y += dt * body.vy;
 			body.z += dt * body.vz;
-		}
+		}*/
 
 		time += (System.currentTimeMillis() - startTime);
 	}
@@ -118,6 +133,10 @@ public class NBodySystem {
 			}
 		}
 		return e;
+	}
+
+	public NBody[] get() {
+		return bodies;
 	}
 
 	/*
