@@ -88,7 +88,7 @@ public class NBodySystem {
 				}
 		 });
 		
-		//Seq is faster because of overhead
+		//Seq is faster because of overhead (tested for 1M)
 		for (NBody body : bodies) {
 			body.x += dt * body.vx;
 			body.y += dt * body.vy;
