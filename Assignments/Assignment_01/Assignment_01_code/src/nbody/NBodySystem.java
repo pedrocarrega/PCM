@@ -1,8 +1,7 @@
 package nbody;
 
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Phaser;
+import java.util.stream.IntStream;
 
 public class NBodySystem {
 	
@@ -18,9 +17,9 @@ public class NBodySystem {
 	public long time = 0;
 	
 	protected NBody[] bodies;
-	protected NBody[] currentBodies;
+	//protected NBody[] currentBodies;
 	
-	private final int NTHREADS = Runtime.getRuntime().availableProcessors();
+	//private final int NTHREADS = Runtime.getRuntime().availableProcessors();
 
 	public NBodySystem(int n, long seed) {
 		Random random = new Random(seed);
@@ -40,10 +39,9 @@ public class NBodySystem {
 	
 	public void advance(double dt) {
 		
-		
 		long startTime = System.currentTimeMillis();
 		
-
+		/*
 		for (int i = 0; i < bodies.length; ++i) {
 			NBody iBody = bodies[i];
 			for (int j = i + 1; j < bodies.length; ++j) {
@@ -64,8 +62,33 @@ public class NBodySystem {
 				body.vy += dy * iBody.mass * mag;
 				body.vz += dz * iBody.mass * mag;
 			}
-		}
+		}*/
+		
+		IntStream.range(0, bodies.length)
+		 .parallel()
+		 .forEach((int i) -> {
+			 NBody iBody = bodies[i];
+				for (int j = i + 1; j < bodies.length; ++j) {
+					final NBody body = bodies[j];
+					double dx = iBody.x - body.x;
+					double dy = iBody.y - body.y;
+					double dz = iBody.z - body.z;
 
+					double dSquared = dx * dx + dy * dy + dz * dz;
+					double distance = Math.sqrt(dSquared);
+					double mag = dt / (dSquared * distance);
+
+					iBody.vx -= dx * body.mass * mag;
+					iBody.vy -= dy * body.mass * mag;
+					iBody.vz -= dz * body.mass * mag;
+
+					body.vx += dx * iBody.mass * mag;
+					body.vy += dy * iBody.mass * mag;
+					body.vz += dz * iBody.mass * mag;
+				}
+		 });
+		
+		//Seq is faster because of overhead
 		for (NBody body : bodies) {
 			body.x += dt * body.vx;
 			body.y += dt * body.vy;
@@ -96,6 +119,7 @@ public class NBodySystem {
 		return e;
 	}
 	
+	/*
 	void startTasks(List<Runnable> tasks, final int iterations) {
 		   final Phaser phaser = new Phaser() {
 		     protected boolean onAdvance(int phase, int registeredParties) {
@@ -109,7 +133,7 @@ public class NBodySystem {
 		   phaser.register(); // register for the first barrier with parties = 1
 		   int taskC = 0;
 		   for (final Runnable task : tasks) {
-			   final int count = taskC;
+			 final int count = taskC;
 		     phaser.register();
 		     new Thread() {
 		       public void run() {
@@ -128,5 +152,5 @@ public class NBodySystem {
 		     taskC++;
 		   }
 		   phaser.arriveAndDeregister(); // releases the first barrier
-		 }
+		 }*/
 }
