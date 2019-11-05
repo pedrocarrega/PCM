@@ -19,7 +19,7 @@ public class NBodySystem {
 
 	protected NBody[] bodies;
 
-	
+
 	public NBodySystem(int n, long seed) {
 		Random random = new Random(seed);
 		bodies = new NBody[n];
@@ -73,26 +73,26 @@ public class NBodySystem {
 				int endIndex = (tidInside + 1) * bodies.length / NTHREADS;
 
 				for (int i = startIndex; i < endIndex; ++i) {
-					synchronized (bodies[i]) {
-						for (int j = i + 1; j < bodies.length; ++j) {
-							synchronized (bodies[j]) {
-								
-								double dx = bodies[i].x - bodies[j].x;
-								double dy = bodies[i].y - bodies[j].y;
-								double dz = bodies[i].z - bodies[j].z;
+					NBody iBody = bodies[i];
+					for (int j = i + 1; j < bodies.length; ++j) {
+						final NBody body = bodies[j];
 
-								double dSquared = dx * dx + dy * dy + dz * dz;
-								double distance = Math.sqrt(dSquared);
-								double mag = dt / (dSquared * distance);
+						double dx = iBody.x - body.x;
+						double dy = iBody.y - body.y;
+						double dz = iBody.z - body.z;
 
-								bodies[i].vx -= dx * bodies[j].mass * mag;
-								bodies[i].vy -= dy * bodies[j].mass * mag;
-								bodies[i].vz -= dz * bodies[j].mass * mag;
+						double dSquared = dx * dx + dy * dy + dz * dz;
+						double distance = Math.sqrt(dSquared);
+						double mag = dt / (dSquared * distance);
 
-								bodies[j].vx += dx * bodies[i].mass * mag;
-								bodies[j].vy += dy * bodies[i].mass * mag;
-								bodies[j].vz += dz * bodies[i].mass * mag;
-							}
+						bodies[i].vx -= dx * body.mass * mag;
+						bodies[i].vy -= dy * body.mass * mag;
+						bodies[i].vz -= dz * body.mass * mag;
+
+						synchronized (body) {
+							body.vx += dx * iBody.mass * mag;
+							body.vy += dy * iBody.mass * mag;
+							body.vz += dz * iBody.mass * mag;
 						}
 					}
 				}
