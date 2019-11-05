@@ -1,11 +1,10 @@
 package nbody;
 
 import java.util.Random;
-import java.util.stream.IntStream;
 
 public class NBodySystem {
 
-	public static final int DEFAULT_ITERATIONS = 5;
+	public static final int DEFAULT_ITERATIONS = 50;
 	public static final int DEFAULT_SIZE = 50000;
 
 	public static final int ADVANCE_THRESHOLD = 1000;
@@ -13,6 +12,8 @@ public class NBodySystem {
 
 	static final double PI = 3.141592653589793;
 	static final double SOLAR_MASS = 4 * PI * PI;
+
+	private static final int NTHREADS = Runtime.getRuntime().availableProcessors();
 
 	public long time = 0;
 
@@ -39,8 +40,8 @@ public class NBodySystem {
 	public void advance(double dt) {
 
 		long startTime = System.currentTimeMillis();
-		NBody[] currentBodies = bodies.clone();
-		
+		Thread[] threads = new Thread[NTHREADS];
+
 
 		/*
 		for (int i = 0; i < bodies.length; ++i) {
@@ -65,29 +66,50 @@ public class NBodySystem {
 			}
 		}*/
 
-		IntStream.range(0, bodies.length)
-		 .parallel()
-		 .forEach((int i) -> {
-			 NBody iBody = bodies[i];
-				for (int j = i + 1; j < bodies.length; ++j) {
-					final NBody body = currentBodies[j];
-					double dx = iBody.x - body.x;
-					double dy = iBody.y - body.y;
-					double dz = iBody.z - body.z;
+		for (int tid=0; tid < NTHREADS; tid++ ) {
+			final int tidInside = tid;
+			Runnable r = () -> {
 
-					double dSquared = dx * dx + dy * dy + dz * dz;
-					double distance = Math.sqrt(dSquared);
-					double mag = dt / (dSquared * distance);
+				int startIndex = tidInside * bodies.length / NTHREADS;
+				int endIndex = (tidInside + 1) * bodies.length / NTHREADS;
 
-					iBody.vx -= dx * body.mass * mag;
-					iBody.vy -= dy * body.mass * mag;
-					iBody.vz -= dz * body.mass * mag;
+				for (int i = startIndex; i < endIndex; ++i) {
+					synchronized (bodies[i]) {
+						for (int j = i + 1; j < bodies.length; ++j) {
+							synchronized (bodies[j]) {
+								
+								double dx = bodies[i].x - bodies[j].x;
+								double dy = bodies[i].y - bodies[j].y;
+								double dz = bodies[i].z - bodies[j].z;
 
-					body.vx += dx * iBody.mass * mag;
-					body.vy += dy * iBody.mass * mag;
-					body.vz += dz * iBody.mass * mag;
+								double dSquared = dx * dx + dy * dy + dz * dz;
+								double distance = Math.sqrt(dSquared);
+								double mag = dt / (dSquared * distance);
+
+								bodies[i].vx -= dx * bodies[j].mass * mag;
+								bodies[i].vy -= dy * bodies[j].mass * mag;
+								bodies[i].vz -= dz * bodies[j].mass * mag;
+
+								bodies[j].vx += dx * bodies[i].mass * mag;
+								bodies[j].vy += dy * bodies[i].mass * mag;
+								bodies[j].vz += dz * bodies[i].mass * mag;
+							}
+						}
+					}
 				}
-		 });
+			};
+			threads[tidInside] = new Thread(r);
+			threads[tidInside].start();
+		}
+
+		for (Thread t :threads) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 
 		//Seq is faster because of overhead (tested for 1M)
 		for (NBody body : bodies) {
@@ -119,61 +141,4 @@ public class NBodySystem {
 		}
 		return e;
 	}
-
-	/*
-	public void advanceAux(double dt) {
-		final Phaser phaser = new Phaser() {
-			protected boolean onAdvance(int phase, int registeredParties) {
-				if(!(phase >= DEFAULT_ITERATIONS || registeredParties == 0)) {
-					currentBodies = bodies.clone();		    		 		    		 
-					return false;
-				}else
-					return true;
-			}
-		};
-		phaser.register(); // register for the first barrier with parties = 1
-		for (int tid=0; tid < NTHREADS; tid++ ) {
-			final int tidInside = tid;
-			phaser.register();
-			new Thread() {
-				public void run() {
-					do {
-						int startIndex = tidInside * bodies.length/NTHREADS;
-						int endIndex = (tidInside + 1) * bodies.length/NTHREADS;
-
-						for(int i = startIndex; i<endIndex; i++) {
-							NBody iBody = bodies[i];
-							for (int j = i + 1; j < bodies.length; ++j) {
-								final NBody body = currentBodies[j];
-								double dx = iBody.x - body.x;
-								double dy = iBody.y - body.y;
-								double dz = iBody.z - body.z;
-
-								double dSquared = dx * dx + dy * dy + dz * dz;
-								double distance = Math.sqrt(dSquared);
-								double mag = dt / (dSquared * distance);
-
-								iBody.vx -= dx * body.mass * mag;
-								iBody.vy -= dy * body.mass * mag;
-								iBody.vz -= dz * body.mass * mag;
-
-								body.vx += dx * iBody.mass * mag;
-								body.vy += dy * iBody.mass * mag;
-								body.vz += dz * iBody.mass * mag;
-							}
-						}
-						
-						for(int i = startIndex; i<endIndex; i++) {
-							bodies[i].x += dt * bodies[i].vx;
-							bodies[i].y += dt * bodies[i].vy;
-							bodies[i].z += dt * bodies[i].vz;
-						}
-
-						phaser.arriveAndAwaitAdvance();
-					} while (!phaser.isTerminated());
-				}
-			}.start();
-		}
-		phaser.arriveAndDeregister(); // releases the first barrier
-	}*/
 }

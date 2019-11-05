@@ -22,8 +22,6 @@ public class NBody {
 		mass = r.nextDouble();
 
 	}
-	
-	public NBody() {}
 
 	NBody offsetMomentum(double px, double py, double pz) {
 		vx = -px / NBodySystem.SOLAR_MASS;
@@ -32,38 +30,21 @@ public class NBody {
 		return this;
 	}
 	
-	@Override
-	public NBody clone() {
+	public boolean equals(NBody body) {
 		
-		NBody copy = new NBody();
-		
-		copy.x = this.x;
-		copy.y = this.y;
-		copy.z = this.z;
-		copy.vx = this.vx;
-		copy.vy = this.vy;
-		copy.vz = this.vz;
-		copy.mass = this.mass;
-
-		return copy;
-		
-	}
-	
-	public boolean equals(NBody compare) {
-		
-		if(this.x != compare.x)
+		if(this.x != body.x)
 			return false;
-		if(this.y != compare.y)
+		if(this.y != body.y)
 			return false;
-		if(this.z != compare.z)
+		if(this.z != body.z)
 			return false;
-		if(this.vx != compare.vx)
+		if(this.vx != body.vx)
 			return false;
-		if(this.vy != compare.vy)
+		if(this.vy != body.vy)
 			return false;
-		if(this.vz != compare.vz)
+		if(this.vz != body.vz)
 			return false;
-		if(this.mass != compare.mass)
+		if(this.mass != body.mass)
 			return false;
 		
 		return true;

@@ -14,7 +14,7 @@ public class Main {
 			System.out.println("IT'S THE SAME RESULT??? " + compare(bodies.get(), body.get()));
 			//System.out.printf("%.9f\n", bodies.energy());
 		}
-		System.out.println("Time: " + bodies.time);
+		//System.out.println("Time: " + bodies.time);
 	}
 	
 	private static int compare(NBody[] body1, NBody[] body2) {
