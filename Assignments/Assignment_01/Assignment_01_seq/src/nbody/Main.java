@@ -9,6 +9,6 @@ public class Main {
 			bodies.advance(0.01);
 			System.out.printf("%.9f\n", bodies.energy());
 		}
-		System.out.println("bleh");
+		System.out.println("\nTime: " + bodies.time);
 	}
 }

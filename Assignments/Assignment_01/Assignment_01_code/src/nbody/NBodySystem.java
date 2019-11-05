@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class NBodySystem {
 
-	public static final int DEFAULT_ITERATIONS = 50;
+	public static final int DEFAULT_ITERATIONS = 5;
 	public static final int DEFAULT_SIZE = 50000;
 
 	public static final int ADVANCE_THRESHOLD = 1000;
@@ -13,14 +13,13 @@ public class NBodySystem {
 	static final double PI = 3.141592653589793;
 	static final double SOLAR_MASS = 4 * PI * PI;
 
-	private static final int NTHREADS = Runtime.getRuntime().availableProcessors();
+	private final int NTHREADS = Runtime.getRuntime().availableProcessors();
 
 	public long time = 0;
 
 	protected NBody[] bodies;
 
-	//private final int NTHREADS = Runtime.getRuntime().availableProcessors();
-
+	
 	public NBodySystem(int n, long seed) {
 		Random random = new Random(seed);
 		bodies = new NBody[n];

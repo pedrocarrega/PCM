@@ -7,8 +7,8 @@ public class Main {
 		//System.out.printf("%.9f\n", bodies.energy());
 		for (int i = 0; i < NBodySystem.DEFAULT_ITERATIONS; ++i) {
 			bodies.advance(0.01);
-			//System.out.printf("%.9f\n", bodies.energy());
+			System.out.printf("%.9f\n", bodies.energy());
 		}
-		System.out.println("Time: " + bodies.time);
+		System.out.println("\nTime: " + bodies.time);
 	}
 }

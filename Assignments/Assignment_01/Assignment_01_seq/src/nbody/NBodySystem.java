@@ -13,6 +13,8 @@ public class NBodySystem {
 	static final double PI = 3.141592653589793;
 	static final double SOLAR_MASS = 4 * PI * PI;
 	
+	public long time;
+	
 	protected NBody[] bodies;
 
 	public NBodySystem(int n, long seed) {
@@ -32,6 +34,8 @@ public class NBodySystem {
 	}
 	
 	public void advance(double dt) {
+		
+		long startTime = System.currentTimeMillis();
 
 		for (int i = 0; i < bodies.length; ++i) {
 			NBody iBody = bodies[i];
@@ -60,6 +64,8 @@ public class NBodySystem {
 			body.y += dt * body.vy;
 			body.z += dt * body.vz;
 		}
+		
+		time += (System.currentTimeMillis()-startTime);
 	}
 
 	public double energy() {
