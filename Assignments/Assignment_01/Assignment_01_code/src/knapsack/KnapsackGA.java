@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 public class KnapsackGA {
 	private static final int N_GENERATIONS = 500;
-	private static final int POP_SIZE = 200000;
+	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private Individual[] population = new Individual[POP_SIZE];
 
