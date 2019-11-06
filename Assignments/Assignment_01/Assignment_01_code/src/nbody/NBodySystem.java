@@ -1,10 +1,11 @@
 package nbody;
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class NBodySystem {
 
-	public static final int DEFAULT_ITERATIONS = 5;
+	public static final int DEFAULT_ITERATIONS = 25;
 	public static final int DEFAULT_SIZE = 50000;
 
 	public static final int ADVANCE_THRESHOLD = 1000;
@@ -110,12 +111,20 @@ public class NBodySystem {
 		}
 
 
-		//Seq is faster because of overhead (tested for 1M)
+		/*Seq is faster because of overhead (tested for 1M)
 		for (NBody body : bodies) {
 			body.x += dt * body.vx;
 			body.y += dt * body.vy;
 			body.z += dt * body.vz;
-		}
+		}*/
+		
+		IntStream.range(0, bodies.length)
+				 .parallel()
+				 .forEach((int i) -> {
+					 bodies[i].x += dt * bodies[i].vx;
+					 bodies[i].y += dt * bodies[i].vy;
+					 bodies[i].z += dt * bodies[i].vz;
+		});
 
 		time += (System.currentTimeMillis() - startTime);
 	}
