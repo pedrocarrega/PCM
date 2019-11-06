@@ -85,9 +85,9 @@ public class NBodySystem {
 						double distance = Math.sqrt(dSquared);
 						double mag = dt / (dSquared * distance);
 
-						bodies[i].vx -= dx * body.mass * mag;
-						bodies[i].vy -= dy * body.mass * mag;
-						bodies[i].vz -= dz * body.mass * mag;
+						iBody.vx -= dx * body.mass * mag;
+						iBody.vy -= dy * body.mass * mag;
+						iBody.vz -= dz * body.mass * mag;
 
 						synchronized (body) {
 							body.vx += dx * iBody.mass * mag;
