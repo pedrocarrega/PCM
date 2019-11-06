@@ -1,6 +1,5 @@
 package knapsack;
 
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
 @SuppressWarnings("serial")
@@ -22,7 +21,7 @@ public class ParallelMergeSort extends RecursiveAction{
 	@Override
 	protected void compute() {
 		if (low < high) {
-			if (high - low <= MAX || Math.abs(ForkJoinTask.getSurplusQueuedTaskCount()) > 8) {
+			if (high - low <= MAX) {
 				mergesort(array, helper, low, high);
 			} else {
 				final int middle = (low + high) / 2;
