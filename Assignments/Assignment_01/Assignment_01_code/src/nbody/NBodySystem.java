@@ -16,7 +16,7 @@ public class NBodySystem {
 
 	private final int NTHREADS = Runtime.getRuntime().availableProcessors();
 
-	public long time = 0;
+	//public long time = 0;
 
 	protected NBody[] bodies;
 
@@ -39,7 +39,7 @@ public class NBodySystem {
 
 	public void advance(double dt) {
 
-		long startTime = System.currentTimeMillis();
+		//long startTime = System.currentTimeMillis();
 		Thread[] threads = new Thread[NTHREADS];
 
 
@@ -89,7 +89,7 @@ public class NBodySystem {
 						iBody.vx -= dx * body.mass * mag;
 						iBody.vy -= dy * body.mass * mag;
 						iBody.vz -= dz * body.mass * mag;
-
+						
 						synchronized (body) {
 							body.vx += dx * iBody.mass * mag;
 							body.vy += dy * iBody.mass * mag;
@@ -126,7 +126,7 @@ public class NBodySystem {
 					 bodies[i].z += dt * bodies[i].vz;
 		});
 
-		time += (System.currentTimeMillis() - startTime);
+		//time += (System.currentTimeMillis() - startTime);
 	}
 
 	public double energy() {
