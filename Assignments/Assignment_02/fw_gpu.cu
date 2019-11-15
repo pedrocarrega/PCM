@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include "include/time.h"
 
 #define GRAPH_SIZE 2000
 
