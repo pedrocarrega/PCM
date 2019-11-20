@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <cuda.h>
+#include <cuda_runtime.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,8 +35,8 @@ void generate_random_graph(int *output, int graph_size) {
   }
 }
 
-void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
-  // TODO
+__global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
+    //TODO
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
@@ -61,10 +62,14 @@ int main(int argc, char **argv) {
   timersub(&tv2, &tv1, &tv);                                                   \
   time_delta = (float)tv.tv_sec + tv.tv_usec / 1000000.0
 
+  cudaDeviceProp prop;
+  cudaGetDeviceProperties(&prop, 0);
+    
+    
   struct timeval tv1, tv2, tv;
-  float time_delta;
+  float time_delta = 0;
 
-  int *graph, *output_cpu, *output_gpu;
+  int *graph, *graph_gpu, *output_cpu, *output_gpu;
   int size;
 
   size = sizeof(int) * GRAPH_SIZE * GRAPH_SIZE;
@@ -82,15 +87,21 @@ int main(int argc, char **argv) {
   generate_random_graph(graph, GRAPH_SIZE);
 
   fprintf(stderr, "running on cpu...\n");
-  TIMER_START();
+  //TIMER_START();
   floyd_warshall_cpu(graph, GRAPH_SIZE, output_cpu);
-  TIMER_STOP();
+  //TIMER_STOP();
   fprintf(stderr, "%f secs\n", time_delta);
 
   fprintf(stderr, "running on gpu...\n");
-  TIMER_START();
-  floyd_warshall_gpu(graph, GRAPH_SIZE, output_gpu);
-  TIMER_STOP();
+  //TIMER_START();
+  
+  cudaMalloc(&graph_gpu, size);
+  cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice);
+
+  int test = prop.maxThreadsPerBlock;
+
+  floyd_warshall_gpu<<<size/test, test>>>(graph_gpu, GRAPH_SIZE, output_gpu);
+  //TIMER_STOP();
   fprintf(stderr, "%f secs\n", time_delta);
 
   if (memcmp(output_cpu, output_gpu, size) != 0) {
