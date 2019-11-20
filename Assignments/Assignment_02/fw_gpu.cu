@@ -13,6 +13,14 @@
 
 #define INF 0x1fffffff
 
+#define HANDLE_ERROR(error) { \
+    if (error != cudaSuccess) { \
+        fprintf(stderr, "%s in %s at line %d\n", \
+                cudaGetErrorString(error), __FILE__, __LINE__); \
+        exit(EXIT_FAILURE); \
+    } \
+} \
+
 void generate_random_graph(int *output, int graph_size) {
   int i, j;
 
@@ -37,6 +45,7 @@ void generate_random_graph(int *output, int graph_size) {
 
 __global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
     //TODO
+    __shared__ int cache[1];
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
@@ -95,8 +104,8 @@ int main(int argc, char **argv) {
   fprintf(stderr, "running on gpu...\n");
   //TIMER_START();
   
-  cudaMalloc(&graph_gpu, size);
-  cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice);
+  HANDLE_ERROR((&graph_gpu, size));
+  HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
 
   int test = prop.maxThreadsPerBlock;
 
