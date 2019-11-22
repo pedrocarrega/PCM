@@ -1,12 +1,13 @@
 #include <assert.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <device_launch_parameters.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include/time.h"
+#include <time.h>
 
-#define GRAPH_SIZE 2000
+#define GRAPH_SIZE 32
 
 #define EDGE_COST(graph, graph_size, a, b) graph[a * graph_size + b]
 #define D(a, b) EDGE_COST(output, graph_size, a, b)
@@ -44,8 +45,16 @@ void generate_random_graph(int *output, int graph_size) {
 }
 
 __global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
-    //TODO
-    //__shared__ int cache[];
+    
+    //__shared__ int best;
+    int col = blockIdx.x * blockDim.x * threadIdx.x;
+    if (col >= graph_size) return;
+    int idx = graph_size * blockIdx.y + col;
+    /*
+    PLACE SHARED MEMORY
+    __syncthreads();
+    */
+
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
@@ -65,18 +74,20 @@ void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
 }
 
 int main(int argc, char **argv) {
-#define TIMER_START() gettimeofday(&tv1, NULL)
+/*#define TIMER_START() gettimeofday(&tv1, NULL)
 #define TIMER_STOP()                                                           \
   gettimeofday(&tv2, NULL);                                                    \
   timersub(&tv2, &tv1, &tv);                                                   \
   time_delta = (float)tv.tv_sec + tv.tv_usec / 1000000.0
 
-  cudaDeviceProp prop;
-  cudaGetDeviceProperties(&prop, 0);
+  
     
     
   struct timeval tv1, tv2, tv;
-  float time_delta = 0;
+  float time_delta = 0;*/
+    
+  cudaDeviceProp prop;
+  cudaGetDeviceProperties(&prop, 0);
 
   int *graph, *graph_gpu, *output_cpu, *output_gpu;
   int size;
@@ -99,19 +110,26 @@ int main(int argc, char **argv) {
   //TIMER_START();
   floyd_warshall_cpu(graph, GRAPH_SIZE, output_cpu);
   //TIMER_STOP();
-  fprintf(stderr, "%f secs\n", time_delta);
+  //fprintf(stderr, "%f secs\n", time_delta);
 
   fprintf(stderr, "running on gpu...\n");
   //TIMER_START();
   
-  HANDLE_ERROR((&graph_gpu, size));
+  HANDLE_ERROR(cudaMalloc(&graph_gpu, size));
   HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
 
-  int test = prop.maxThreadsPerBlock;
+  dim3 dimGrid((GRAPH_SIZE + prop.maxThreadsPerBlock - 1) / prop.maxThreadsPerBlock, GRAPH_SIZE);
 
-  floyd_warshall_gpu<<<size/test, test>>>(graph_gpu, GRAPH_SIZE, output_gpu);
+  for (int k = 0; k < GRAPH_SIZE; k++)
+  {
+      floyd_warshall_gpu<<<1, dim3(GRAPH_SIZE, GRAPH_SIZE)>>>(graph_gpu, GRAPH_SIZE, output_gpu);
+      cudaError_t err = cudaDeviceSynchronize();
+      if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
+  }
+
+  
   //TIMER_STOP();
-  fprintf(stderr, "%f secs\n", time_delta);
+  //fprintf(stderr, "%f secs\n", time_delta);
 
   if (memcmp(output_cpu, output_gpu, size) != 0) {
     fprintf(stderr, "FAIL!\n");

@@ -85,13 +85,6 @@
   <ItemGroup>
     <None Include="report.docx" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\times.h" />
-    <ClInclude Include="include\time.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="include\time.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.1.targets" />
