@@ -45,7 +45,7 @@ void generate_random_graph(int *output, int graph_size) {
 
 __global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
     //TODO
-    __shared__ int cache[1];
+    //__shared__ int cache[];
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
