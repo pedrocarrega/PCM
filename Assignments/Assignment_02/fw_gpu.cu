@@ -129,6 +129,9 @@ int main(int argc, char **argv) {
       if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
   }
 
+  cudaMemcpy(output_gpu, graph_gpu, GRAPH_SIZE, cudaMemcpyDeviceToHost);
+  cudaFree(graph_gpu);
+
   
   //TIMER_STOP();
   //fprintf(stderr, "%f secs\n", time_delta);
