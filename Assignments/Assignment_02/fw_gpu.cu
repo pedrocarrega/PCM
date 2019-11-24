@@ -44,6 +44,8 @@ void generate_random_graph(int *output, int graph_size) {
   }
 }
 
+__device__ int min(int x, int y) { return x < y ? x : y; }
+
 __global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
     
     //__shared__ int best;
