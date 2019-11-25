@@ -46,7 +46,7 @@ void generate_random_graph(int *output, int graph_size) {
 
 __device__ int min(int x, int y) { return x < y ? x : y; }
 
-__global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output) {
+__global__ void floyd_warshall_gpu(int *graph, int graph_size, int *output, int const k) {
     
     //__shared__ int best;
     int col = blockIdx.x * blockDim.x * threadIdx.x;
@@ -56,6 +56,10 @@ __global__ void floyd_warshall_gpu(const int *graph, int graph_size, int *output
     PLACE SHARED MEMORY
     __syncthreads();
     */
+    int best = graph[graph_size * blockIdx.y + k];
+    int temp = graph[k * graph_size + col];
+    graph[idx] = min(graph[idx], (best + temp));
+    //p[idx] = k; ????
 
 }
 
@@ -124,7 +128,7 @@ int main(int argc, char **argv) {
 
   for (int k = 0; k < GRAPH_SIZE; k++)
   {
-      floyd_warshall_gpu<<<1, dim3(GRAPH_SIZE, GRAPH_SIZE)>>>(graph_gpu, GRAPH_SIZE, output_gpu);
+      floyd_warshall_gpu<<<dimGrid, prop.maxThreadsPerBlock>>>(graph_gpu, GRAPH_SIZE, output_gpu, k);
       cudaError_t err = cudaDeviceSynchronize();
       if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
   }
