@@ -44,25 +44,28 @@ void generate_random_graph(int *output, int graph_size) {
   }
 }
 
-__device__ int min(int x, int y) { return x < y ? x : y; }
+//__device__ int min(int x, int y) { return x < y ? x : y; }
 
 __global__ void floyd_warshall_gpu(int *graph, int graph_size, int *output, int const k) {
     
     //__shared__ int best;
-    int col = blockIdx.x * blockDim.x * threadIdx.x;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
     if (col >= graph_size) return;
-    int idx = graph_size * blockIdx.y + col;
+    //int idx = graph_size * blockIdx.y + col;
+    int idx = col * graph_size;
     /*
     PLACE SHARED MEMORY
     __syncthreads();
-    /
-    int best = graph[graph_size * blockIdx.y + k];
-    int temp = graph[k * graph_size + col];
-    graph[idx] = min(graph[idx], (best + temp));
-    //p[idx] = k; ????
     */
+    if (D(col, k) + D(k, idx) < D(col, idx)) {
+        D(col, idx) = D(col, k) + D(k, idx);
+    }
+    //p[idx] = k; ????
+    
+    
 
-    D(col, idx) = min(D(col, k), D(k, idx));
+    //D(col, idx) = min(D(col, k), D(k, idx));
+    
 
 }
 
@@ -80,6 +83,19 @@ void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
       }
     }
   }
+}
+
+void printGraph(int* output, int graph_size) {
+    int i, j;
+        for (i = 0; i < graph_size; i++) {
+            
+            for (j = 0; j < graph_size; j++) {
+                int k = D(i, j);
+                fprintf(stderr, "%d ", k);
+            }
+            fprintf(stderr, "\n");
+        
+    }
 }
 
 int main(int argc, char **argv) {
@@ -123,20 +139,22 @@ int main(int argc, char **argv) {
 
   fprintf(stderr, "running on gpu...\n");
   //TIMER_START();
+  printGraph(output_cpu, GRAPH_SIZE);
   
-  HANDLE_ERROR(cudaMalloc(&graph_gpu, size));
+  HANDLE_ERROR(cudaMalloc((void**)&graph_gpu, size));
   HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
 
   dim3 dimGrid((GRAPH_SIZE + prop.maxThreadsPerBlock - 1) / prop.maxThreadsPerBlock, GRAPH_SIZE);
 
   for (int k = 0; k < GRAPH_SIZE; k++)
   {
-      floyd_warshall_gpu<<<dimGrid, prop.maxThreadsPerBlock>>>(graph_gpu, GRAPH_SIZE, output_gpu, k);
+      floyd_warshall_gpu<<<1, GRAPH_SIZE>>>(graph_gpu, GRAPH_SIZE, output_gpu, k);
       cudaError_t err = cudaDeviceSynchronize();
       if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
   }
 
   cudaMemcpy(output_gpu, graph_gpu, GRAPH_SIZE, cudaMemcpyDeviceToHost);
+  printGraph(output_gpu, GRAPH_SIZE);
   cudaFree(graph_gpu);
 
   
