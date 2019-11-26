@@ -61,6 +61,7 @@ __global__ void floyd_warshall_gpu(int *graph, int graph_size, int *output, int 
     graph[idx] = min(graph[idx], (best + temp));
     //p[idx] = k; ????
     */
+
     D(col, idx) = min(D(col, k), D(k, idx));
 
 }
