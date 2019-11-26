@@ -55,11 +55,13 @@ __global__ void floyd_warshall_gpu(int *graph, int graph_size, int *output, int 
     /*
     PLACE SHARED MEMORY
     __syncthreads();
-    */
+    /
     int best = graph[graph_size * blockIdx.y + k];
     int temp = graph[k * graph_size + col];
     graph[idx] = min(graph[idx], (best + temp));
     //p[idx] = k; ????
+    */
+    D(col, idx) = min(D(col, k), D(k, idx));
 
 }
 
