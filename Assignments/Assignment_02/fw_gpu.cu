@@ -7,7 +7,7 @@
 #include <string.h>
 #include <Windows.h>
 
-#define GRAPH_SIZE 10000
+#define GRAPH_SIZE 5000
 
 #define EDGE_COST(graph, graph_size, a, b) graph[a * graph_size + b]
 #define D(a, b) EDGE_COST(output, graph_size, a, b)
