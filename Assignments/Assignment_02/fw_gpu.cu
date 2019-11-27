@@ -48,24 +48,17 @@ void generate_random_graph(int *output, int graph_size) {
 
 __global__ void floyd_warshall_gpu(int *output, int graph_size, int const k) {
     
-    //__shared__ int best;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
-    if (col >= graph_size){
-    //int idx = graph_size * blockIdx.y + col;
-    int idx = blockIdx.y * blockDim.y + threadIdx.y;
-    /*
-    PLACE SHARED MEMORY
-    __syncthreads();
-    */
-    if (D(col, k) + D(k, idx) < D(col, idx)) {
-        D(col, idx) = D(col, k) + D(k, idx);
+    if (col < graph_size){
+        int idx = blockIdx.y * blockDim.y + threadIdx.y;
+        /*
+        PLACE SHARED MEMORY
+        __syncthreads();
+        */
+        if (D(col, k) + D(k, idx) < D(col, idx)) {
+            D(col, idx) = D(col, k) + D(k, idx);
+        }
     }
-    }
-    
-
-    //D(col, idx) = min(D(col, k), D(k, idx));
-    
-
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
@@ -86,13 +79,13 @@ void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
 
 void printGraph(int* output, int graph_size) {
     int i, j;
-        for (i = 0; i < graph_size; i++) {
+    for (i = 0; i < graph_size; i++) {
             
-            for (j = 0; j < graph_size; j++) {
-                int k = D(i, j);
-                fprintf(stderr, "%d ", k);
-            }
-            fprintf(stderr, "\n");
+        for (j = 0; j < graph_size; j++) {
+            int k = D(i, j);
+            fprintf(stderr, "%d ", k);
+        }
+        fprintf(stderr, "\n");
         
     }
 }
@@ -144,10 +137,11 @@ int main(int argc, char **argv) {
   HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
 
   dim3 dimGrid((GRAPH_SIZE + prop.maxThreadsPerBlock - 1) / prop.maxThreadsPerBlock, GRAPH_SIZE);
+  //dim3(GRAPH_SIZE, GRAPH_SIZE)
 
-  for (int k = 0; k < GRAPH_SIZE; k++)
-  {
-      floyd_warshall_gpu<<<1, dim3(GRAPH_SIZE,GRAPH_SIZE)>>>(graph_gpu, GRAPH_SIZE, k);
+  for (int k = 0; k < GRAPH_SIZE; k++){
+
+      floyd_warshall_gpu<<<1, dim3(GRAPH_SIZE, GRAPH_SIZE) >>>(graph_gpu, GRAPH_SIZE, k);
       cudaError_t err = cudaDeviceSynchronize();
       if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
   }
