@@ -135,10 +135,10 @@ int main(int argc, char **argv) {
   floyd_warshall_cpu(graph, GRAPH_SIZE, output_cpu);
   //TIMER_STOP();
   //fprintf(stderr, "%f secs\n", time_delta);
-
+printGraph(output_cpu, GRAPH_SIZE);
   fprintf(stderr, "running on gpu...\n");
   //TIMER_START();
-  printGraph(output_cpu, GRAPH_SIZE);
+  
   
   HANDLE_ERROR(cudaMalloc(&graph_gpu, size));
   HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
