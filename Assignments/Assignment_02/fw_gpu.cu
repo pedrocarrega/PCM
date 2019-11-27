@@ -46,13 +46,13 @@ void generate_random_graph(int *output, int graph_size) {
 
 //__device__ int min(int x, int y) { return x < y ? x : y; }
 
-__global__ void floyd_warshall_gpu(int *graph, int graph_size, int *output, int const k) {
+__global__ void floyd_warshall_gpu(int *output, int graph_size, int const k) {
     
     //__shared__ int best;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
-    if (col >= graph_size) return;
+    if (col >= graph_size){
     //int idx = graph_size * blockIdx.y + col;
-    int idx = col * graph_size;
+    int idx = blockIdx.y * blockDim.y + threadIdx.y;
     /*
     PLACE SHARED MEMORY
     __syncthreads();
@@ -60,8 +60,7 @@ __global__ void floyd_warshall_gpu(int *graph, int graph_size, int *output, int 
     if (D(col, k) + D(k, idx) < D(col, idx)) {
         D(col, idx) = D(col, k) + D(k, idx);
     }
-    //p[idx] = k; ????
-    
+    }
     
 
     //D(col, idx) = min(D(col, k), D(k, idx));
@@ -141,19 +140,19 @@ int main(int argc, char **argv) {
   //TIMER_START();
   printGraph(output_cpu, GRAPH_SIZE);
   
-  HANDLE_ERROR(cudaMalloc((void**)&graph_gpu, size));
+  HANDLE_ERROR(cudaMalloc(&graph_gpu, size));
   HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
 
   dim3 dimGrid((GRAPH_SIZE + prop.maxThreadsPerBlock - 1) / prop.maxThreadsPerBlock, GRAPH_SIZE);
 
   for (int k = 0; k < GRAPH_SIZE; k++)
   {
-      floyd_warshall_gpu<<<1, GRAPH_SIZE>>>(graph_gpu, GRAPH_SIZE, output_gpu, k);
+      floyd_warshall_gpu<<<1, dim3(GRAPH_SIZE,GRAPH_SIZE)>>>(graph_gpu, GRAPH_SIZE, k);
       cudaError_t err = cudaDeviceSynchronize();
       if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
   }
 
-  cudaMemcpy(output_gpu, graph_gpu, GRAPH_SIZE, cudaMemcpyDeviceToHost);
+  cudaMemcpy(output_gpu, graph_gpu, size, cudaMemcpyDeviceToHost);
   printGraph(output_gpu, GRAPH_SIZE);
   cudaFree(graph_gpu);
 
