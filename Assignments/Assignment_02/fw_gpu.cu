@@ -90,23 +90,12 @@ void printGraph(int* output, int graph_size) {
 }
 
 int main(int argc, char **argv) {
-/*#define TIMER_START() gettimeofday(&tv1, NULL)
-#define TIMER_STOP()                                                           \
-  gettimeofday(&tv2, NULL);                                                    \
-  timersub(&tv2, &tv1, &tv);                                                   \
-  time_delta = (float)tv.tv_sec + tv.tv_usec / 1000000.0
 
-  
-    
-    
-  struct timeval tv1, tv2, tv;
-  float time_delta = 0;*/
 
     LARGE_INTEGER frequency;
     LARGE_INTEGER start;
     LARGE_INTEGER end;
     double interval;
-    //float time_delta;
     
   cudaDeviceProp prop;
   cudaGetDeviceProperties(&prop, 0);
