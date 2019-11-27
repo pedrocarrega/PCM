@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
   floyd_warshall_cpu(graph, GRAPH_SIZE, output_cpu);
   //TIMER_STOP();
   //fprintf(stderr, "%f secs\n", time_delta);
-printGraph(output_cpu, GRAPH_SIZE);
+  printGraph(output_cpu, GRAPH_SIZE);
   fprintf(stderr, "running on gpu...\n");
   //TIMER_START();
   
