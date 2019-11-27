@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <Windows.h>
 
-#define GRAPH_SIZE 32
+#define GRAPH_SIZE 10000
 
 #define EDGE_COST(graph, graph_size, a, b) graph[a * graph_size + b]
 #define D(a, b) EDGE_COST(output, graph_size, a, b)
@@ -49,16 +49,15 @@ void generate_random_graph(int *output, int graph_size) {
 __global__ void floyd_warshall_gpu(int *output, int graph_size, int const k) {
     
     int col = blockIdx.x * blockDim.x + threadIdx.x;
-    if (col < graph_size){
-        int idx = blockIdx.y * blockDim.y + threadIdx.y;
-        /*
-        PLACE SHARED MEMORY
-        __syncthreads();
-        */
+    int idx = blockIdx.y * blockDim.y + threadIdx.y;
+    while (col < graph_size){
         if (D(col, k) + D(k, idx) < D(col, idx)) {
             D(col, idx) = D(col, k) + D(k, idx);
         }
+        col += blockDim.x * gridDim.x;
+        idx += blockDim.y * gridDim.y;
     }
+    
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
@@ -102,6 +101,12 @@ int main(int argc, char **argv) {
     
   struct timeval tv1, tv2, tv;
   float time_delta = 0;*/
+
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER start;
+    LARGE_INTEGER end;
+    double interval;
+    //float time_delta;
     
   cudaDeviceProp prop;
   cudaGetDeviceProperties(&prop, 0);
@@ -124,13 +129,20 @@ int main(int argc, char **argv) {
   generate_random_graph(graph, GRAPH_SIZE);
 
   fprintf(stderr, "running on cpu...\n");
-  //TIMER_START();
+  QueryPerformanceFrequency(&frequency);
+  QueryPerformanceCounter(&start);
   floyd_warshall_cpu(graph, GRAPH_SIZE, output_cpu);
-  //TIMER_STOP();
-  //fprintf(stderr, "%f secs\n", time_delta);
-  printGraph(output_cpu, GRAPH_SIZE);
+  QueryPerformanceCounter(&end);
+  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  fprintf(stderr, "%f secs interval\n", interval);
+
+  
+  
+  //printGraph(output_cpu, GRAPH_SIZE);
+  
   fprintf(stderr, "running on gpu...\n");
-  //TIMER_START();
+  QueryPerformanceFrequency(&frequency);
+  QueryPerformanceCounter(&start);
   
   
   HANDLE_ERROR(cudaMalloc(&graph_gpu, size));
@@ -141,18 +153,21 @@ int main(int argc, char **argv) {
 
   for (int k = 0; k < GRAPH_SIZE; k++){
 
-      floyd_warshall_gpu<<<1, dim3(GRAPH_SIZE, GRAPH_SIZE) >>>(graph_gpu, GRAPH_SIZE, k);
+      floyd_warshall_gpu<<<dimGrid, prop.maxThreadsPerBlock>>>(graph_gpu, GRAPH_SIZE, k);
       cudaError_t err = cudaDeviceSynchronize();
       if (err != cudaSuccess) { printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__); }
   }
 
   cudaMemcpy(output_gpu, graph_gpu, size, cudaMemcpyDeviceToHost);
-  printGraph(output_gpu, GRAPH_SIZE);
+  
+  //printGraph(output_gpu, GRAPH_SIZE);
+  
   cudaFree(graph_gpu);
 
   
-  //TIMER_STOP();
-  //fprintf(stderr, "%f secs\n", time_delta);
+  QueryPerformanceCounter(&end);
+  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  fprintf(stderr, "%f secs interval\n", interval);
 
   if (memcmp(output_cpu, output_gpu, size) != 0) {
     fprintf(stderr, "FAIL!\n");
