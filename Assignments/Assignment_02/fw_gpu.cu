@@ -7,7 +7,7 @@
 #include <string.h>
 #include <Windows.h>
 
-#define GRAPH_SIZE 5000
+#define GRAPH_SIZE 2000
 
 #define EDGE_COST(graph, graph_size, a, b) graph[a * graph_size + b]
 #define D(a, b) EDGE_COST(output, graph_size, a, b)
@@ -57,7 +57,6 @@ __global__ void floyd_warshall_gpu(int *output, int graph_size, int const k) {
         col += blockDim.x * gridDim.x;
         idx += blockDim.y * gridDim.y;
     }
-    
 }
 
 void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
@@ -126,7 +125,6 @@ int main(int argc, char **argv) {
   fprintf(stderr, "%f secs interval\n", interval);
 
   
-  
   //printGraph(output_cpu, GRAPH_SIZE);
   
   fprintf(stderr, "running on gpu...\n");
@@ -138,7 +136,6 @@ int main(int argc, char **argv) {
   HANDLE_ERROR(cudaMemcpy(graph_gpu, graph, size, cudaMemcpyHostToDevice));
 
   dim3 dimGrid((GRAPH_SIZE + prop.maxThreadsPerBlock - 1) / prop.maxThreadsPerBlock, GRAPH_SIZE);
-  //dim3(GRAPH_SIZE, GRAPH_SIZE)
 
   for (int k = 0; k < GRAPH_SIZE; k++){
 
