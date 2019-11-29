@@ -7,7 +7,7 @@
 #include <string.h>
 #include <Windows.h>
 
-#define GRAPH_SIZE 2000
+#define GRAPH_SIZE 3000
 
 #define EDGE_COST(graph, graph_size, a, b) graph[a * graph_size + b]
 #define D(a, b) EDGE_COST(output, graph_size, a, b)
@@ -44,8 +44,6 @@ void generate_random_graph(int *output, int graph_size) {
   }
 }
 
-//__device__ int min(int x, int y) { return x < y ? x : y; }
-
 __global__ void floyd_warshall_gpu(int *output, int graph_size, int const k) {
     
     int col = blockIdx.x * blockDim.x + threadIdx.x;
@@ -73,19 +71,6 @@ void floyd_warshall_cpu(const int *graph, int graph_size, int *output) {
       }
     }
   }
-}
-
-void printGraph(int* output, int graph_size) {
-    int i, j;
-    for (i = 0; i < graph_size; i++) {
-            
-        for (j = 0; j < graph_size; j++) {
-            int k = D(i, j);
-            fprintf(stderr, "%d ", k);
-        }
-        fprintf(stderr, "\n");
-        
-    }
 }
 
 int main(int argc, char **argv) {
@@ -125,8 +110,6 @@ int main(int argc, char **argv) {
   fprintf(stderr, "%f secs interval\n", interval);
 
   
-  //printGraph(output_cpu, GRAPH_SIZE);
-  
   fprintf(stderr, "running on gpu...\n");
   QueryPerformanceFrequency(&frequency);
   QueryPerformanceCounter(&start);
@@ -145,8 +128,6 @@ int main(int argc, char **argv) {
   }
 
   cudaMemcpy(output_gpu, graph_gpu, size, cudaMemcpyDeviceToHost);
-  
-  //printGraph(output_gpu, GRAPH_SIZE);
   
   cudaFree(graph_gpu);
 
