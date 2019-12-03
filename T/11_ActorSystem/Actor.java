@@ -54,7 +54,7 @@ public abstract class Actor implements Runnable{
 			if(!mailbox.isEmpty()) {
 				Message current = mailbox.remove();
 				processAnyMessage(current);
-				sleepCounter  = 1;
+				sleepCounter = 1;
 			}else {
 				sleepCounter *= 2;
 				if(sleepCounter > 10000)
