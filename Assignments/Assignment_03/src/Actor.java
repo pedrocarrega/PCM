@@ -34,10 +34,18 @@ public abstract class Actor implements Runnable{
 	}
 
 	private void add(Message m) {
-		if(left == null && value > m.getNumber())
+		if(left == null && value > m.getNumber()) {
 			left = new ActorNode(m);
-		else if(right == null && value < m.getNumber())
+			ResponseMessage reply = new ResponseMessage(1, m.getSender());
+			m.getSender().receiveMessage(reply);
+		}
+			
+		else if(right == null && value < m.getNumber()) {
 			right = new ActorNode(m);
+			ResponseMessage reply = new ResponseMessage(1, m.getSender());
+			m.getSender().receiveMessage(reply);
+		}
+			
 		else
 			foward(m);
 	}
@@ -51,9 +59,9 @@ public abstract class Actor implements Runnable{
 	
 	protected void die() {
 		if(left != null)
-			left.receiveMessage(new KillMessage());
+			left.receiveMessage(new KillMessage(value, left));
 		if(right != null)
-			right.receiveMessage(new KillMessage());
+			right.receiveMessage(new KillMessage(value, right));
 		this.run = false;
 	}
 
