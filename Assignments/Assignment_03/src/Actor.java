@@ -7,6 +7,7 @@ public abstract class Actor implements Runnable{
 	private Actor right;
 	private int value;
 	private boolean run;
+	
 
 	public Actor(Message m) {
 		left = null;
@@ -31,30 +32,6 @@ public abstract class Actor implements Runnable{
 	private void processSystemMessage(Message current) {
 		if(current instanceof KillMessage)
 			die();
-	}
-
-	private void add(Message m) {
-		if(left == null && value > m.getNumber()) {
-			left = new ActorNode(m);
-			ResponseMessage reply = new ResponseMessage(1, m.getSender());
-			m.getSender().receiveMessage(reply);
-		}
-			
-		else if(right == null && value < m.getNumber()) {
-			right = new ActorNode(m);
-			ResponseMessage reply = new ResponseMessage(1, m.getSender());
-			m.getSender().receiveMessage(reply);
-		}
-			
-		else
-			foward(m);
-	}
-
-	public void foward(Message m) {
-		if(left.getValue() > m.getNumber())
-			left.receiveMessage(m);
-		else
-			right.receiveMessage(m);
 	}
 	
 	protected void die() {

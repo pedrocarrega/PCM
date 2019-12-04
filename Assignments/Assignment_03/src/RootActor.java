@@ -10,7 +10,9 @@ public class RootActor extends Actor {
 
 	@Override
 	protected void processMessage(Message m) {
-		// TODO Auto-generated method stub
+		if(m instanceof StartMessage) {
+			
+		}
 		
 	}
 }
