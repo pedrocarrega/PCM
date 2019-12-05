@@ -19,10 +19,10 @@ public abstract class Actor extends Thread implements Runnable{
 	private boolean run;
 
 
-	public Actor(Message m) {
+	public Actor(int i) {
 		left = null;
 		right = null;
-		value = m.getNumber();
+		value = i;
 		run = true;
 	}
 
@@ -38,7 +38,7 @@ public abstract class Actor extends Thread implements Runnable{
 			m.getSender().receiveMessage(reply);
 		}else if(value > m.getNumber()) {
 			if(left == null) {
-				left = new ActorNode(m);
+				left = new ActorNode(m.getNumber());
 				left.start();
 				AddResponseMessage reply = new AddResponseMessage(1, this);
 				m.getSender().receiveMessage(reply);
@@ -47,7 +47,7 @@ public abstract class Actor extends Thread implements Runnable{
 			}
 		}else{
 			if(right == null) {
-				right = new ActorNode(m);
+				right = new ActorNode(m.getNumber());
 				right.start();
 				AddResponseMessage reply = new AddResponseMessage(1, this);
 				m.getSender().receiveMessage(reply);

@@ -1,14 +1,16 @@
 package app;
 
 import app.messagetypes.AddMessage;
+import app.messagetypes.ContainsMessage;
+import app.messagetypes.RemoveMessage;
 import library.Actor;
 import library.Message;
 
 public class ActorNode extends Actor {
 
-	public ActorNode(Message m) {
-		super(m);
-		// TODO Auto-generated constructor stub
+
+	public ActorNode(int i) {
+		super(i);
 	}
 
 	@Override
@@ -16,7 +18,16 @@ public class ActorNode extends Actor {
 		if(m instanceof AddMessage) {
 			AddMessage m2 = (AddMessage) m;
 			add(m2);
-		}
+		}else if(m instanceof ContainsMessage) {
+			ContainsMessage m2 = (ContainsMessage) m;
+			contains(m2);
+		}else if(m instanceof RemoveMessage) {
+			RemoveMessage m2 = (RemoveMessage) m;
+			remove(m2);
+		}/*else if(m instanceof ReorganizeMessage) {
+			ReorganizeMessage m2 = (ReorganizeMessage) m;
+			reorganize(m2);
+		}*/
 		
 	}
 

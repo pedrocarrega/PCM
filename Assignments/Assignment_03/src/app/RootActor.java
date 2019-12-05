@@ -12,8 +12,8 @@ import library.Message;
 
 public class RootActor extends Actor {
 	
-	public RootActor() {
-		super(null);
+	public RootActor(int i) {
+		super(i);
 	}
 
 	@Override
