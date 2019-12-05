@@ -6,6 +6,7 @@ import app.messagetypes.AddMessage;
 import app.messagetypes.AddResponseMessage;
 import app.messagetypes.ContainsMessage;
 import app.messagetypes.ContainsResponseMessage;
+import app.messagetypes.RemoveMessage;
 import library.Message;
 
 public abstract class Actor extends Thread implements Runnable{
@@ -76,7 +77,7 @@ public abstract class Actor extends Thread implements Runnable{
 		}
 	}
 
-	protected void remove() {
+	protected void remove(RemoveMessage m) {
 		//TODO
 		this.run = false;
 	}
