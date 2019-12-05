@@ -34,6 +34,28 @@ public abstract class Actor implements Runnable{
 			die();
 	}
 	
+	protected void add(AddMessage m) {
+		if(this.value == m.getNumber()) {
+			//lancar erro?
+		}else if(value > m.getNumber()) {
+			if(left == null) {
+				left = new ActorNode(m);
+			ResponseMessage reply = new ResponseMessage(1, m.getSender());
+			m.getSender().receiveMessage(reply);
+			}else {
+				left.receiveMessage(m);
+			}
+		}else{
+			if(right == null) {
+				right = new ActorNode(m);
+			ResponseMessage reply = new ResponseMessage(1, m.getSender());
+			m.getSender().receiveMessage(reply);
+			}else {
+				right.receiveMessage(m);
+			}
+		}
+	}
+	
 	protected void die() {
 		if(left != null)
 			left.receiveMessage(new KillMessage(value, left));
