@@ -1,7 +1,8 @@
-package T10;
+package app;
+
+import app.messagetypes.StartMessage;
 
 public class Main {
-
 	public static void main(String[] args) {
 		System.out.println("hello");
 		
