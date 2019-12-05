@@ -1,3 +1,7 @@
+package app.messagetypes;
+
+import library.Actor;
+import library.Message;
 
 public class StartMessage extends Message{
 

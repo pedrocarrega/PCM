@@ -1,3 +1,7 @@
+package app;
+
+import app.messagetypes.StartMessage;
+
 public class Client {
 
 	public static void main(String[] args) {

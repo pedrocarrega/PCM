@@ -1,6 +1,14 @@
+package library;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class Actor implements Runnable{
+import app.ActorNode;
+import app.messagetypes.ResponseMessage;
+import library.Message;
+import library.messagetypes.AddMessage;
+import library.messagetypes.KillMessage;
+import library.messagetypes.SystemMessage;
+
+public abstract class Actor extends Thread implements Runnable{
 
 	private LinkedBlockingQueue<Message> mailbox = new LinkedBlockingQueue<>();
 	private Actor left;
