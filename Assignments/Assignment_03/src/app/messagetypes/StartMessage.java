@@ -9,4 +9,8 @@ public class StartMessage extends Message{
 		super(num, actor);
 	}
 
+	public StartMessage() {
+		super(-1, null);
+	}
+
 }

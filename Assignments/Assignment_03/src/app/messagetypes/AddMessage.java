@@ -1,4 +1,4 @@
-package library.messagetypes;
+package app.messagetypes;
 
 import library.Actor;
 import library.Message;

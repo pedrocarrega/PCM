@@ -1,8 +1,8 @@
 package app;
 
+import app.messagetypes.AddMessage;
 import library.Actor;
 import library.Message;
-import library.messagetypes.AddMessage;
 
 public class ActorNode extends Actor {
 
