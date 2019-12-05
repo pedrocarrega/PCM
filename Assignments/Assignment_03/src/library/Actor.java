@@ -7,6 +7,7 @@ import app.messagetypes.AddResponseMessage;
 import app.messagetypes.ContainsMessage;
 import app.messagetypes.ContainsResponseMessage;
 import app.messagetypes.RemoveMessage;
+import app.messagetypes.RemoveResponseMessage;
 import library.Message;
 
 public abstract class Actor extends Thread implements Runnable{
@@ -78,8 +79,23 @@ public abstract class Actor extends Thread implements Runnable{
 	}
 
 	protected void remove(RemoveMessage m) {
-		//TODO
-		this.run = false;
+		if(value == m.getNumber()) {
+			this.run = false;
+		}else if(value > m.getNumber()) {
+			if(left != null) {
+				left.receiveMessage(m);
+			}else {
+				RemoveResponseMessage reply = new RemoveResponseMessage(0, this);
+				m.getSender().receiveMessage(reply);
+			}
+		}else{
+			if(right != null) {
+				right.receiveMessage(m);
+			}else {
+				RemoveResponseMessage reply = new RemoveResponseMessage(0, this);
+				m.getSender().receiveMessage(reply);
+			}
+		}
 	}
 
 	public int getValue() {
