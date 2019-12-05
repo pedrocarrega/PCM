@@ -16,7 +16,7 @@ public abstract class Actor extends Thread implements Runnable{
 	private Actor right;
 	private int value;
 	private boolean run;
-	
+
 
 	public Actor(Message m) {
 		left = null;
@@ -24,47 +24,49 @@ public abstract class Actor extends Thread implements Runnable{
 		value = m.getNumber();
 		run = true;
 	}
-	
+
 	public void receiveMessage(Message m) {
 		mailbox.add(m);
 	}
-	
+
 	protected abstract void processMessage(Message m);
-	
+
 	private void processAnyMessage(Message current) {
 		if(current instanceof SystemMessage)
 			processSystemMessage(current);
 		else
 			processMessage(current);
 	}
-	
+
 	private void processSystemMessage(Message current) {
 		if(current instanceof KillMessage)
 			die();
 	}
-	
+
 	protected void add(AddMessage m) {
 		if(this.value == m.getNumber()) {
 			//lancar erro?
 		}else if(value > m.getNumber()) {
 			if(left == null) {
 				left = new ActorNode(m);
-			ResponseMessage reply = new ResponseMessage(1, this);
-			m.getSender().receiveMessage(reply);
+				left.start();
+				ResponseMessage reply = new ResponseMessage(1, this);
+				m.getSender().receiveMessage(reply);
 			}else {
 				left.receiveMessage(m);
 			}
 		}else{
 			if(right == null) {
 				right = new ActorNode(m);
-			ResponseMessage reply = new ResponseMessage(1, this);
-			m.getSender().receiveMessage(reply);
+				right.start();
+				ResponseMessage reply = new ResponseMessage(1, this);
+				m.getSender().receiveMessage(reply);
 			}else {
 				right.receiveMessage(m);
 			}
 		}
 	}
-	
+
 	protected void contains(ContainsMessage m) {
 		if(value == m.getNumber()) {
 			ResponseMessage reply = new ResponseMessage(1, this);
@@ -85,7 +87,7 @@ public abstract class Actor extends Thread implements Runnable{
 			}
 		}
 	}
-	
+
 	protected void die() {
 		if(left != null)
 			left.receiveMessage(new KillMessage(value, this));
@@ -97,7 +99,7 @@ public abstract class Actor extends Thread implements Runnable{
 	public int getValue() {
 		return this.value;
 	}
-	
+
 	public void run() {
 		while(run) {
 			int sleepCounter = 1;
@@ -116,7 +118,7 @@ public abstract class Actor extends Thread implements Runnable{
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
 	}
 }
