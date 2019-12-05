@@ -3,11 +3,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import app.ActorNode;
 import app.messagetypes.AddMessage;
+import app.messagetypes.AddResponseMessage;
 import app.messagetypes.ContainsMessage;
-import app.messagetypes.ResponseMessage;
+import app.messagetypes.ContainsResponseMessage;
 import library.Message;
-import library.messagetypes.KillMessage;
-import library.messagetypes.SystemMessage;
 
 public abstract class Actor extends Thread implements Runnable{
 
@@ -31,26 +30,15 @@ public abstract class Actor extends Thread implements Runnable{
 
 	protected abstract void processMessage(Message m);
 
-	private void processAnyMessage(Message current) {
-		if(current instanceof SystemMessage)
-			processSystemMessage(current);
-		else
-			processMessage(current);
-	}
-
-	private void processSystemMessage(Message current) {
-		if(current instanceof KillMessage)
-			die();
-	}
-
 	protected void add(AddMessage m) {
 		if(this.value == m.getNumber()) {
-			//lancar erro?
+			AddResponseMessage reply = new AddResponseMessage(0, this);
+			m.getSender().receiveMessage(reply);
 		}else if(value > m.getNumber()) {
 			if(left == null) {
 				left = new ActorNode(m);
 				left.start();
-				ResponseMessage reply = new ResponseMessage(1, this);
+				AddResponseMessage reply = new AddResponseMessage(1, this);
 				m.getSender().receiveMessage(reply);
 			}else {
 				left.receiveMessage(m);
@@ -59,7 +47,7 @@ public abstract class Actor extends Thread implements Runnable{
 			if(right == null) {
 				right = new ActorNode(m);
 				right.start();
-				ResponseMessage reply = new ResponseMessage(1, this);
+				AddResponseMessage reply = new AddResponseMessage(1, this);
 				m.getSender().receiveMessage(reply);
 			}else {
 				right.receiveMessage(m);
@@ -69,30 +57,27 @@ public abstract class Actor extends Thread implements Runnable{
 
 	protected void contains(ContainsMessage m) {
 		if(value == m.getNumber()) {
-			ResponseMessage reply = new ResponseMessage(1, this);
+			ContainsResponseMessage reply = new ContainsResponseMessage(1, this);
 			m.getSender().receiveMessage(reply);
 		}else if(value > m.getNumber()) {
 			if(left != null) {
 				left.receiveMessage(m);
 			}else {
-				ResponseMessage reply = new ResponseMessage(0, this);
+				ContainsResponseMessage reply = new ContainsResponseMessage(0, this);
 				m.getSender().receiveMessage(reply);
 			}
 		}else{
 			if(right != null) {
 				right.receiveMessage(m);
 			}else {
-				ResponseMessage reply = new ResponseMessage(0, this);
+				ContainsResponseMessage reply = new ContainsResponseMessage(0, this);
 				m.getSender().receiveMessage(reply);
 			}
 		}
 	}
 
-	protected void die() {
-		if(left != null)
-			left.receiveMessage(new KillMessage(value, this));
-		if(right != null)
-			right.receiveMessage(new KillMessage(value, this));
+	protected void remove() {
+		//TODO
 		this.run = false;
 	}
 
@@ -105,7 +90,7 @@ public abstract class Actor extends Thread implements Runnable{
 			int sleepCounter = 1;
 			if(!mailbox.isEmpty()) {
 				Message current = mailbox.remove();
-				processAnyMessage(current);
+				processMessage(current);
 				sleepCounter = 1;
 			}else {
 				sleepCounter *= 2;
