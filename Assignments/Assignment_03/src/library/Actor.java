@@ -8,6 +8,7 @@ import app.messagetypes.ContainsMessage;
 import app.messagetypes.ContainsResponseMessage;
 import app.messagetypes.RemoveMessage;
 import app.messagetypes.RemoveResponseMessage;
+import app.messagetypes.ReorganizeMessage;
 import library.Message;
 
 public abstract class Actor extends Thread implements Runnable{
@@ -80,22 +81,42 @@ public abstract class Actor extends Thread implements Runnable{
 
 	protected void remove(RemoveMessage m) {
 		if(value == m.getNumber()) {
+			if(left != null && right != null) {
+				ReorganizeMessage organize = new ReorganizeMessage(0, m.getSupervisor(), m.getSide());
+				right.receiveMessage(organize);
+			}else if(left != null) {
+				ReorganizeMessage organize = new ReorganizeMessage(1, left, 0);
+				m.getSender().receiveMessage(organize);
+			}else if(right != null) {
+				ReorganizeMessage organize = new ReorganizeMessage(1, right, 1);
+				m.getSender().receiveMessage(organize);
+			}
 			this.run = false;
+			RemoveResponseMessage reply = new RemoveResponseMessage(1, this);
+			m.getSender().receiveMessage(reply);
 		}else if(value > m.getNumber()) {
 			if(left != null) {
-				left.receiveMessage(m);
+				left.receiveMessage(new RemoveMessage(m.getNumber(), m.getSender(), this, 0));
 			}else {
 				RemoveResponseMessage reply = new RemoveResponseMessage(0, this);
 				m.getSender().receiveMessage(reply);
 			}
 		}else{
 			if(right != null) {
-				right.receiveMessage(m);
+				right.receiveMessage(new RemoveMessage(m.getNumber(), m.getSender(), this, 1));
 			}else {
 				RemoveResponseMessage reply = new RemoveResponseMessage(0, this);
 				m.getSender().receiveMessage(reply);
 			}
 		}
+	}
+
+	public Actor getLeft() {
+		return left;
+	}
+
+	public Actor getRight() {
+		return right;
 	}
 
 	public int getValue() {

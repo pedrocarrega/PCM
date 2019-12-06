@@ -29,7 +29,7 @@ public class Client {
 	}
 	
 	private static void removeNode(int number, RootActor root) {
-		root.receiveMessage(new RemoveMessage(number, root));
+		root.receiveMessage(new RemoveMessage(number, root, root, -1));
 	}
 
 }

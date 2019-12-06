@@ -7,6 +7,7 @@ import app.messagetypes.ContainsMessage;
 import app.messagetypes.ContainsResponseMessage;
 import app.messagetypes.RemoveMessage;
 import app.messagetypes.RemoveResponseMessage;
+import app.messagetypes.ReorganizeMessage;
 import library.Actor;
 import library.Message;
 
@@ -41,6 +42,15 @@ public class RootActor extends Actor {
 				System.out.println("Remove successful");
 			}else {
 				System.out.println("Remove failed");
+			}
+		}else if(m instanceof ReorganizeMessage) {
+			ReorganizeMessage m2 = (ReorganizeMessage) m;
+			if(m2.getSide() == 1) {
+				Actor right = this.getRight();
+				right = m2.getSender();
+			}else {
+				Actor left = this.getLeft();
+				left = m2.getSender();
 			}
 		}
 	}
