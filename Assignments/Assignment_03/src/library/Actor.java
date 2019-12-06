@@ -134,16 +134,18 @@ public abstract class Actor extends Thread implements Runnable{
 	}
 
 	public void run() {
+		int sleepCounter = 10;
 		while(run) {
-			int sleepCounter = 1;
 			if(!mailbox.isEmpty()) {
 				Message current = mailbox.remove();
 				processMessage(current);
-				sleepCounter = 1;
+				sleepCounter = 10;
 			}else {
 				sleepCounter *= 2;
-				if(sleepCounter > 10000)
+				if(sleepCounter > 10000) {
 					sleepCounter = 10000;
+					run = false;
+				}
 				try {
 					Thread.sleep(sleepCounter);
 				} catch (InterruptedException e) {
