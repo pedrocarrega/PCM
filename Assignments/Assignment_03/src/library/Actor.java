@@ -92,6 +92,8 @@ public abstract class Actor extends Thread implements Runnable{
 				m.getSender().receiveMessage(organize);
 			}
 			this.run = false;
+			this.right = null;
+			this.left = null;
 			RemoveResponseMessage reply = new RemoveResponseMessage(1, this);
 			m.getSender().receiveMessage(reply);
 		}else if(value > m.getNumber()) {
