@@ -46,11 +46,13 @@ public class RootActor extends Actor {
 		}else if(m instanceof ReorganizeMessage) {
 			ReorganizeMessage m2 = (ReorganizeMessage) m;
 			if(m2.getSide() == 1) {
-				Actor right = this.getRight();
-				right = m2.getSender();
+				this.setRight(m2.getSender());
+				//Actor right = this.getRight();
+				//right = m2.getSender();
 			}else {
-				Actor left = this.getLeft();
-				left = m2.getSender();
+				this.setLeft(m2.getSender());
+				//Actor left = this.getLeft();
+				//left = m2.getSender();
 			}
 		}
 	}

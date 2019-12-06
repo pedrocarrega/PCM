@@ -111,6 +111,14 @@ public abstract class Actor extends Thread implements Runnable{
 		}
 	}
 
+	public void setLeft(Actor left) {
+		this.left = left;
+	}
+
+	public void setRight(Actor right) {
+		this.right = right;
+	}
+
 	public Actor getLeft() {
 		return left;
 	}
