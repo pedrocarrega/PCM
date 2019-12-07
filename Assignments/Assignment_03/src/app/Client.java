@@ -17,11 +17,10 @@ public class Client {
 		containsNode(1, root);
 		containsNode(2, root);
 		removeNode(1, root);
-		removeNode(1, root);
 		containsNode(3, root);
-		containsNode(5, root);
-		containsNode(0, root);
-		addNode(1, root);
+		containsNode(1, root);
+		addNode(2, root);
+		containsNode(2, root);
 		root.start();
 		
 	}

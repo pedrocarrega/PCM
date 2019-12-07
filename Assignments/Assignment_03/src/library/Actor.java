@@ -135,7 +135,7 @@ public abstract class Actor extends Thread implements Runnable{
 
 	public void run() {
 		int sleepCounter = 10;
-		while(run) {
+		while(run || !mailbox.isEmpty()) {
 			if(!mailbox.isEmpty()) {
 				Message current = mailbox.remove();
 				processMessage(current);
@@ -144,12 +144,11 @@ public abstract class Actor extends Thread implements Runnable{
 				sleepCounter *= 2;
 				if(sleepCounter > 10000) {
 					sleepCounter = 10000;
-					run = false;
+					//run = false;
 				}
 				try {
 					Thread.sleep(sleepCounter);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
