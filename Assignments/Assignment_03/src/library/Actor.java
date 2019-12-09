@@ -94,6 +94,7 @@ public abstract class Actor extends Thread implements Runnable{
 			this.run = false;
 			this.right = null;
 			this.left = null;
+			mailbox.removeAll(null);
 			RemoveResponseMessage reply = new RemoveResponseMessage(1, this);
 			m.getSender().receiveMessage(reply);
 		}else if(value > m.getNumber()) {
@@ -135,7 +136,7 @@ public abstract class Actor extends Thread implements Runnable{
 
 	public void run() {
 		int sleepCounter = 10;
-		while(run || !mailbox.isEmpty()) {
+		while(run) {
 			if(!mailbox.isEmpty()) {
 				Message current = mailbox.remove();
 				processMessage(current);
