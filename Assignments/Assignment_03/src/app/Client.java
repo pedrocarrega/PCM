@@ -8,20 +8,32 @@ import app.messagetypes.RemoveMessage;
 
 public class Client {
 
+	private static final int NUM_OPERATIONS = 1000;
+	private static final int ACTOR_VAL_RANGE = 15;
+
 	public static void main(String[] args) {
 		
+		Random r = new Random();
+		
 		RootActor root = new RootActor(0);
+		root.start();
+		
+		
 		addNode(5, root);
 		addNode(1, root);
 		addNode(3, root);
-		containsNode(1, root);
-		containsNode(2, root);
-		removeNode(1, root);
-		containsNode(3, root);
-		containsNode(1, root);
-		addNode(2, root);
-		containsNode(2, root);
-		root.start();
+		
+		for(int i = 0; i < NUM_OPERATIONS; i++) {
+            int decision = r.nextInt(3);
+
+            if(decision == 0) {
+                addNode(r.nextInt(ACTOR_VAL_RANGE), root);
+            }else if(decision == 1) {
+                containsNode(r.nextInt(ACTOR_VAL_RANGE), root);
+            }else {
+                removeNode(r.nextInt(ACTOR_VAL_RANGE)+1, root);
+            }
+        }
 		
 	}
 	
