@@ -30,12 +30,8 @@ public class ActorNode extends Actor {
 			if(m2.getNumber() == 1) {
 				if(m2.getSide() == 1) {
 					this.setRight(m2.getSender());
-					//Actor right = this.getRight();
-					//right = m2.getSender();
 				}else {
 					this.setLeft(m2.getSender());
-					//Actor left = this.getLeft();
-					//left = m2.getSender();
 				}
 			}else {
 				if(this.getLeft() == null) {
